@@ -9,6 +9,7 @@
 #define realloc(ptr, size) RedisModule_Realloc(ptr, size)
 #define free(ptr) RedisModule_Free(ptr)
 
+int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);

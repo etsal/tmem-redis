@@ -93,3 +93,7 @@ int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     return REDISMODULE_OK;
 }
 
+int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+        RedisModule_ReplyWithSimpleString(ctx, "Dummy done");
+	return REDISMODULE_OK;
+}
