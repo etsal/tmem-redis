@@ -17,7 +17,7 @@ int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
  
     
     size_t key_len, value_len;
-    const char *key = RedisModule_StringPtrLen(argv[1], &key_len);
+    char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
     char *value;
 
     value = calloc(PAGE_SIZE, sizeof(char));
@@ -26,17 +26,17 @@ int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return REDISMODULE_OK;
     }
 
-    struct key_value pair = {
+    struct get_message get_message = {
         .key = key,
         .key_len = key_len,
-        .value = value,
-        .value_len = value_len,
+	.value = value,
+	.value_lenp = &value_len,
     };
 
-    if (ioctl(fd, TMEM_GET, (unsigned long) &pair)) {
+    if (ioctl(fd, TMEM_GET, &get_message)) {
         RedisModule_ReplyWithSimpleString(ctx, "No such key");
     } else {
-        RedisModule_ReplyWithSimpleString(ctx, pair.value);
+        RedisModule_ReplyWithSimpleString(ctx, get_message.value);
     }
 
     free(value);
@@ -52,17 +52,17 @@ int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     size_t key_len, value_len;
    
 
-    const char *key = RedisModule_StringPtrLen(argv[1], &key_len);
-    const char *value = RedisModule_StringPtrLen(argv[2], &value_len);
+    char *key = RedisModule_StringPtrLen(argv[1], &key_len);
+    char *value = RedisModule_StringPtrLen(argv[2], &value_len);
 
-    struct key_value pair = {
+    struct put_message put_message = {
         .key = key,
         .key_len = key_len,
         .value = value,
         .value_len = value_len,
     };
 
-    if (ioctl(fd, TMEM_PUT, (unsigned long) &pair)) {
+    if (ioctl(fd, TMEM_PUT, &put_message)) {
         RedisModule_ReplyWithSimpleString(ctx, "Put failed");
         return REDISMODULE_ERR;
     }
@@ -77,14 +77,14 @@ int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return RedisModule_WrongArity(ctx);
     
     size_t key_len;
-    const char *key = RedisModule_StringPtrLen(argv[1], &key_len);
+    char *key = RedisModule_StringPtrLen(argv[1], &key_len);
 
-    struct key_value pair = {
+    struct invalidate_message invalidate_message = {
         .key = key,
         .key_len = key_len,
     };
 
-    if (ioctl(fd, TMEM_INVAL, (unsigned long) &pair)) {
+    if (ioctl(fd, TMEM_INVAL, &invalidate_message)) {
         RedisModule_ReplyWithSimpleString(ctx, "Invalidate failed");
         return REDISMODULE_OK;
     }

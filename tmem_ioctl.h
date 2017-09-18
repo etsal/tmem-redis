@@ -7,12 +7,23 @@
 
 #define PAGE_SIZE (4096)
 
-struct key_value {
-    const void *key;
+struct put_message {
+    void *key;
     size_t key_len; 
-    const void *value;
+    void *value;
     size_t value_len; 
 };
 
+struct get_message {
+    void *key;
+    size_t key_len; 
+    void *value;
+    size_t *value_lenp; 
+};
+
+struct invalidate_message {
+    void *key;
+    size_t key_len; 
+};
 
 #endif /* _TMEMIOCTL_H */
