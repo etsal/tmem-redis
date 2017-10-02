@@ -20,7 +20,7 @@ int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
     char *value;
 
-    value = calloc(PAGE_SIZE, sizeof(char));
+    value = malloc(256 * PAGE_SIZE);
     if (!value) {
         fprintf(stderr, "calloc() failed\n");
         return REDISMODULE_OK;
@@ -34,12 +34,16 @@ int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     };
 
     if (ioctl(fd, TMEM_GET, &get_message)) {
-        RedisModule_ReplyWithSimpleString(ctx, "No such key");
+        RedisModule_ReplyWithSimpleString(ctx, "Get Failed (not empty, failed)"); 
     } else {
-        RedisModule_ReplyWithSimpleString(ctx, get_message.value);
+	
+	value[value_len] = '\0';
+	RedisModule_ReplyWithSimpleString(ctx, "OK");
+        //RedisModule_ReplyWithSimpleString(ctx, get_message.value);
     }
 
     free(value);
+
     return REDISMODULE_OK;
     
 }
