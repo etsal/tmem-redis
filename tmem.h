@@ -12,6 +12,8 @@
 int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
+int TmemFileGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
+int TmemFilePut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 struct chunk_key {

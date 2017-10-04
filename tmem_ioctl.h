@@ -7,6 +7,8 @@
 
 #define PAGE_SIZE (4096)
 
+#define TMEM_MAX (1024 * 1024)
+
 struct put_message {
     void *key;
     size_t key_len; 

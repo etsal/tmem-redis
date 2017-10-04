@@ -26,6 +26,12 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     if (RedisModule_CreateCommand(ctx, "tmem.put", TmemPut, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
+    if (RedisModule_CreateCommand(ctx, "tmem.fileget", TmemFileGet, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
+    if (RedisModule_CreateCommand(ctx, "tmem.fileput", TmemFilePut, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
     if (RedisModule_CreateCommand(ctx, "tmem.inval", TmemInval, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
     
