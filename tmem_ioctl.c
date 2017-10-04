@@ -16,44 +16,7 @@
 #define TMEM_PATH ("/dev/tmem_dev")
 extern int fd;
 
-int TmemSilentGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
-
-    if (argc != 2)
-        return RedisModule_WrongArity(ctx);
- 
-    
-    size_t key_len, value_len;
-    char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
-    char *value ;
-
-    value = malloc(256 * PAGE_SIZE);
-    if (!value) {
-        fprintf(stderr, "calloc() failed\n");
-        return REDISMODULE_OK;
-    }
-
-    struct get_message get_message = {
-        .key = key,
-        .key_len = key_len,
-	.value = value,
-	.value_lenp = &value_len,
-    };
-
-    if (ioctl(fd, TMEM_GET, &get_message)) {
-        RedisModule_ReplyWithSimpleString(ctx, "Get Failed (not empty, failed)"); 
-    } else {
-	
-	value[value_len] = '\0';
-	RedisModule_ReplyWithSimpleString(ctx, "OK");
-        //RedisModule_ReplyWithSimpleString(ctx, get_message.value);
-    }
-
-    free(value);
-
-    return REDISMODULE_OK;
-    
-}
-
+/* Vanilla command. Write the output to the command line */
 int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     if (argc != 2)
@@ -64,7 +27,7 @@ int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
     char *value ;
 
-    value = malloc(256 * PAGE_SIZE);
+    value = malloc(TMEM_MAX);
     if (!value) {
         fprintf(stderr, "calloc() failed\n");
         return REDISMODULE_OK;
@@ -91,6 +54,8 @@ int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     
 }
 
+
+/* Vanilla command .Read the input from the command line */
 int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     
     if (argc != 3)
@@ -119,66 +84,7 @@ int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 }
 
 
-int TmemFilePut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
-
-    
-    size_t key_len, value_len, unused;
-    char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
-    char *value ;
-    char *filename = RedisModule_StringPtrLen(argv[2], &unused);
-    int ret = REDISMODULE_ERR;
-    int put_fd;
-
-    struct stat st;
-
-    if (argc != 3)
-        return RedisModule_WrongArity(ctx);
-
- 
-    put_fd = open(filename, O_RDONLY | O_CREAT);
-    if (put_fd < 0)
-	return REDISMODULE_ERR;
-
-	
-    if(fstat(put_fd, &st))
-	goto fileput_out; 
-    value_len = st.st_size;
-
-
-    value = (char *) mmap(NULL, value_len, PROT_READ, MAP_SHARED, put_fd, 0); 
-    if (value == MAP_FAILED)
-	goto fileput_out; 
-
-
-    struct put_message put_message = {
-        .key = key,
-        .key_len = key_len,
-	.value = value,
-	.value_len = value_len,
-    };
-
-
-    if (ioctl(fd, TMEM_PUT, &put_message)) 
-        RedisModule_ReplyWithSimpleString(ctx, "Put failed"); 
-    else 	
-	RedisModule_ReplyWithSimpleString(ctx, "OK");
-    
-
-
-    if(munmap(value, value_len))
-	goto fileput_out;
-
-
-    ret = REDISMODULE_OK;
-
-fileput_out:
-
-    close(put_fd);
-   
-    return ret;
-}
-
-
+/* Like TmemGet, but write the input to a memory-mapped file */
 int TmemFileGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     
@@ -250,8 +156,109 @@ fileget_out:
 //    printf("Done\n");
     return ret;
 }
+
+
+/* Like TmemPut, but read the input from a memory-mapped file */
+int TmemFilePut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+
+    
+    size_t key_len, value_len, unused;
+    char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
+    char *value ;
+    char *filename = RedisModule_StringPtrLen(argv[2], &unused);
+    int ret = REDISMODULE_ERR;
+    int put_fd;
+
+    struct stat st;
+
+    if (argc != 3)
+        return RedisModule_WrongArity(ctx);
+
+ 
+    put_fd = open(filename, O_RDONLY | O_CREAT);
+    if (put_fd < 0)
+	return REDISMODULE_ERR;
+
+	
+    if(fstat(put_fd, &st))
+	goto fileput_out; 
+    value_len = st.st_size;
+
+
+    value = (char *) mmap(NULL, value_len, PROT_READ, MAP_SHARED, put_fd, 0); 
+    if (value == MAP_FAILED)
+	goto fileput_out; 
+
+
+    struct put_message put_message = {
+        .key = key,
+        .key_len = key_len,
+	.value = value,
+	.value_len = value_len,
+    };
+
+
+    if (ioctl(fd, TMEM_PUT, &put_message)) 
+        RedisModule_ReplyWithSimpleString(ctx, "Put failed"); 
+    else 	
+	RedisModule_ReplyWithSimpleString(ctx, "OK");
     
 
+
+    if(munmap(value, value_len))
+	goto fileput_out;
+
+
+    ret = REDISMODULE_OK;
+
+fileput_out:
+
+    close(put_fd);
+   
+    return ret;
+}
+
+
+    
+/* Like TmemGet, but do not print out the result received */
+int TmemSilentGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+
+    if (argc != 2)
+        return RedisModule_WrongArity(ctx);
+ 
+    
+    size_t key_len, value_len;
+    char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
+    char *value ;
+
+    value = malloc(TMEM_MAX);
+    if (!value) {
+        fprintf(stderr, "calloc() failed\n");
+        return REDISMODULE_OK;
+    }
+
+    struct get_message get_message = {
+        .key = key,
+        .key_len = key_len,
+	.value = value,
+	.value_lenp = &value_len,
+    };
+
+    if (ioctl(fd, TMEM_GET, &get_message)) {
+        RedisModule_ReplyWithSimpleString(ctx, "Get Failed (not empty, failed)"); 
+    } else {
+	
+	RedisModule_ReplyWithSimpleString(ctx, "OK");
+    }
+
+    free(value);
+
+    return REDISMODULE_OK;
+    
+}
+
+
+/* Vanilla command. Invalidate a key */ 
 int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     if (argc != 2)
