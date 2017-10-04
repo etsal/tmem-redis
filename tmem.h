@@ -10,6 +10,7 @@
 #define free(ptr) RedisModule_Free(ptr)
 
 int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
+int TmemSilentGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemFileGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);

@@ -16,6 +16,43 @@
 #define TMEM_PATH ("/dev/tmem_dev")
 extern int fd;
 
+int TmemSilentGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+
+    if (argc != 2)
+        return RedisModule_WrongArity(ctx);
+ 
+    
+    size_t key_len, value_len;
+    char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
+    char *value ;
+
+    value = malloc(256 * PAGE_SIZE);
+    if (!value) {
+        fprintf(stderr, "calloc() failed\n");
+        return REDISMODULE_OK;
+    }
+
+    struct get_message get_message = {
+        .key = key,
+        .key_len = key_len,
+	.value = value,
+	.value_lenp = &value_len,
+    };
+
+    if (ioctl(fd, TMEM_GET, &get_message)) {
+        RedisModule_ReplyWithSimpleString(ctx, "Get Failed (not empty, failed)"); 
+    } else {
+	
+	value[value_len] = '\0';
+	RedisModule_ReplyWithSimpleString(ctx, "OK");
+        //RedisModule_ReplyWithSimpleString(ctx, get_message.value);
+    }
+
+    free(value);
+
+    return REDISMODULE_OK;
+    
+}
 
 int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 

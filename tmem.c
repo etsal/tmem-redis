@@ -20,6 +20,9 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     if (RedisModule_CreateCommand(ctx, "tmem.dummy", TmemDummy, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
+    if (RedisModule_CreateCommand(ctx, "tmem.silentget", TmemSilentGet, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
     if (RedisModule_CreateCommand(ctx, "tmem.get", TmemGet, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
