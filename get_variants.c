@@ -12,6 +12,7 @@
 
 #include "redismodule.h"
 #include "tmem.h"
+#include "tmem_ioctl.h"
 
 /* Like TmemGet, but instead of a tmem operation generate the string here */
 int TmemGenerate(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
@@ -66,7 +67,7 @@ int TmemSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return REDISMODULE_OK;
     }
     
-    ret = tmem_get(key, key_len, value, &value_len);
+    ret = tmem_ioctl_get(key, key_len, value, &value_len);
 
     if (ret) 
         RedisModule_ReplyWithSimpleString(ctx, "ERROR"); 
@@ -97,7 +98,7 @@ int TmemSilentDirty(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return REDISMODULE_OK;
     }
     
-    ret = tmem_get(key, key_len, value, &value_len);
+    ret = tmem_ioctl_get(key, key_len, value, &value_len);
 
     for (i = 0; i < value_len; i += PAGE_SIZE)
 	value[i] = 'a'; 

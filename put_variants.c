@@ -12,8 +12,8 @@
 
 #include "redismodule.h"
 #include "tmem.h"
+#include "tmem_ioctl.h"
 
-#define TMEM_PATH ("/dev/tmem_dev")
 extern int fd;
 
 
@@ -29,7 +29,7 @@ int TmemEcho(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     key = RedisModule_StringPtrLen(argv[1], &key_len);
     value = RedisModule_StringPtrLen(argv[2], &value_len);
-    ret = tmem_put(key, key_len, value, value_len);
+    ret = tmem_ioctl_put(key, key_len, value, value_len);
 
     if (ret)
         RedisModule_ReplyWithSimpleString(ctx, "ERROR");
@@ -104,7 +104,7 @@ int TmemPoison(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     memset(value, 0xfe, value_len);
 
     for (i = 0; i < times_poisoned; i++) {	
-	ret = tmem_put(key, key_len, value, value_len);
+	ret = tmem_ioctl_put(key, key_len, value, value_len);
 	if (ret)
 	    break;
     }
@@ -144,7 +144,7 @@ int TmemPoisonMalloc(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 	}
 	    
 	memset(value, 0xfe, value_len);
-	ret = tmem_put(key, key_len, value, value_len);
+	ret = tmem_ioctl_put(key, key_len, value, value_len);
 	if (ret)
 	    break;
 

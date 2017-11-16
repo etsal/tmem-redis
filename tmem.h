@@ -47,6 +47,6 @@ struct tmem_request {
 	};
 };
 
-int fd;
+
 
 #endif /* _TMEM_H */

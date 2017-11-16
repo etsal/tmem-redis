@@ -12,6 +12,7 @@
 
 #include "redismodule.h"
 #include "tmem.h"
+#include "tmem_ioctl.h"
 
 
 /* Vanilla command. Write the output to the command line */
@@ -32,7 +33,7 @@ int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return REDISMODULE_OK;
     }
     
-    ret = tmem_get(key, key_len, value, &value_len);
+    ret = tmem_ioctl_get(key, key_len, value, &value_len);
 
     if (ret) 
         RedisModule_ReplyWithSimpleString(ctx, "ERROR"); 
@@ -58,7 +59,7 @@ int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     key = RedisModule_StringPtrLen(argv[1], &key_len);
     value = RedisModule_StringPtrLen(argv[2], &value_len);
-    ret = tmem_put(key, key_len, value, value_len);
+    ret = tmem_ioctl_put(key, key_len, value, value_len);
 
     if (ret)
         RedisModule_ReplyWithSimpleString(ctx, "ERROR");
@@ -80,7 +81,7 @@ int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return RedisModule_WrongArity(ctx);
 
     key = RedisModule_StringPtrLen(argv[1], &key_len);
-    ret = tmem_inval(key, key_len);
+    ret = tmem_ioctl_inval(key, key_len);
 
     if (ret)
         RedisModule_ReplyWithSimpleString(ctx, "ERROR");

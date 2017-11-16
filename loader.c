@@ -7,6 +7,7 @@
 #include "loader.h"
 #include "chunk.h"
 #include "tmem.h"
+#include "tmem_ioctl.h"
 
 
 int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {

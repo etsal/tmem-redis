@@ -14,7 +14,7 @@
 
 extern int fd;
 
-int tmem_get(void *key, size_t key_len, void *value, size_t *value_lenp) 
+int tmem_ioctl_get(void *key, size_t key_len, void *value, size_t *value_lenp) 
 {
 
     int ret = 0;
@@ -34,7 +34,7 @@ int tmem_get(void *key, size_t key_len, void *value, size_t *value_lenp)
     return ret;    
 }
 
-int tmem_put(void *key, size_t key_len, void *value, size_t value_len) 
+int tmem_ioctl_put(void *key, size_t key_len, void *value, size_t value_len) 
 {
     
     int ret = 0;
@@ -54,7 +54,7 @@ int tmem_put(void *key, size_t key_len, void *value, size_t value_len)
     return ret;
 }
 
-int tmem_inval(void *key, size_t key_len) 
+int tmem_ioctl_inval(void *key, size_t key_len) 
 {
 	
     int ret = 0;
