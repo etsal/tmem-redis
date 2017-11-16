@@ -1,12 +1,14 @@
 .PHONY: all clean
 
+FLAGS=-Wall -Wno-discarded-qualifiers -Wno-unused-but-set-variable -Wno-unused-variable
+
 all: tmem.so
 
-tmem.so: chunk.o chunk_commands.o tmem_ioctl.o tmem_ioctl_get.o tmem_ioctl_put.o tmem_ioctl_file.o tmem.o
+tmem.so: chunk.o chunk_commands.o base_ops.o put_variants.o get_variants.o tmem.o loader.o
 	gcc $^ -fPIC -shared -g -o tmem.so
     
 %.o: %.c
-	gcc -fPIC -g -c $^ -o $@
+	gcc $(FLAGS) -fPIC -g -c $^ -o $@
 
 clean:
 	rm -rf *.so *.o

@@ -1,45 +1,52 @@
 #ifndef _TMEM_H
 #define _TMEM_H
 
-#include "redismodule.h"
-#include "redisassert.h"
+#include <asm-generic/ioctl.h>
 
-#define malloc(size) RedisModule_Alloc(size)
-#define calloc(count, size) RedisModule_Calloc(count, size)
-#define realloc(ptr, size) RedisModule_Realloc(ptr, size)
-#define free(ptr) RedisModule_Free(ptr)
+#define TMEM_MAGIC ('*') 
 
-int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
+#define TMEM_GET (_IOW(TMEM_MAGIC, 1, long))
+#define TMEM_PUT (_IOR(TMEM_MAGIC, 2, long))
+#define TMEM_INVAL (_IO(TMEM_MAGIC, 3))
+#define TMEM_CONTROL (_IO(TMEM_MAGIC, 4))
 
-int ModuleGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-int ModuleSet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-
-int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
+#define TMEM_PATH ("/dev/tmem_dev")
+#define PAGE_SIZE (4096)
+#define TMEM_MAX (1024 * 1024)
 
 
-int TmemSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-/* SilentGetDirty exists just to prove that it's not a page cache problem */
-int TmemSilentDirty(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-int TmemGenerate(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-
-
-/* Ignore and drop exist just to prove that referencing strings is cheap */
-int TmemIgnore(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-int TmemDrop(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-int TmemPoison(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-int TmemEcho(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-
-
-int TmemFileGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-int TmemFilePut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-
-
-struct chunk_key {
-    uint16_t chunk_id;
-    uint16_t index;
+struct tmem_put_request {
+    void *key;
+    size_t key_len; 
+    void *value;
+    size_t value_len; 
 };
 
+struct tmem_get_request {
+    void *key;
+    size_t key_len; 
+    void *value;
+    size_t *value_lenp; 
+};
+
+struct tmem_invalidate_request {
+    void *key;
+    size_t key_len; 
+};
+
+struct tmem_answer{
+	void *value;
+	size_t *value_lenp;
+};
+
+struct tmem_request {
+	union {
+		struct tmem_put_request put;
+		struct tmem_get_request get;
+		struct tmem_invalidate_request inval;
+	};
+};
+
+int fd;
 
 #endif /* _TMEM_H */

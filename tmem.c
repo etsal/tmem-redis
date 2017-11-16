@@ -1,92 +1,75 @@
 #include <fcntl.h>
-#include <sys/types.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 
-#include "redismodule.h"
+
 #include "tmem.h"
-#include "chunk.h"
 
-#define TMEM_PATH ("/dev/tmem_dev")
+extern int fd;
 
-int fd;
+int tmem_get(void *key, size_t key_len, void *value, size_t *value_lenp) 
+{
 
-int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+    int ret = 0;
 
+    struct tmem_get_request tmem_get_request = {
+        .key = key,
+        .key_len = key_len,
+	.value = value,
+	.value_lenp = value_lenp,
+    };
 
-    if (RedisModule_Init(ctx, "tmem", 1, REDISMODULE_APIVER_1) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "module.set", ModuleSet, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "module.get", ModuleGet, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    /* Base commands */
-
-    if (RedisModule_CreateCommand(ctx, "tmem.dummy", TmemDummy, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.get", TmemGet, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.put", TmemPut, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.inval", TmemInval, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    /* Get variants */
-
-    if (RedisModule_CreateCommand(ctx, "tmem.get.generate", TmemGenerate, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.get.silent", TmemSilent, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.get.silentdirty", TmemSilentDirty, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    /* Put variants */
-
-    if (RedisModule_CreateCommand(ctx, "tmem.put.echo", TmemEcho, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.put.drop", TmemDrop, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.put.ignore", TmemIgnore, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.put.poison", TmemPoison, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-
-    /* File-based commands */
-
-    if (RedisModule_CreateCommand(ctx, "tmem.file.get", TmemFileGet, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.file.put", TmemFilePut, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    /* Chunk commands */
+    if (ioctl(fd, TMEM_GET, &tmem_get_request)) {
+	fprintf(stderr, "tmem_get: ioctl failed\n");
+	ret = -1;
+    }
     
-    if (RedisModule_CreateCommand(ctx, "tmem.chunk.fill", ChunkFill, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
+    return ret;    
+}
 
-    if (RedisModule_CreateCommand(ctx, "tmem.chunk.key", ChunkKey, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
+int tmem_put(void *key, size_t key_len, void *value, size_t value_len) 
+{
+    
+    int ret = 0;
 
-    if (RedisModule_CreateCommand(ctx, "tmem.chunk.inmemory", ChunkInMemory, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
+    struct tmem_put_request tmem_put_request = {
+        .key = key,
+        .key_len = key_len,
+        .value = value,
+        .value_len = value_len,
+    };
 
-    fd = open(TMEM_PATH, O_RDWR); 
-    if (!fd)
-        return REDISMODULE_ERR;
-   
-    return REDISMODULE_OK;
+    if (ioctl(fd, TMEM_PUT, &tmem_put_request)) {
+	fprintf(stderr, "tmem_put: ioctl failed\n");
+	ret = -1;
+    }
+    
+    return ret;
+}
+
+int tmem_inval(void *key, size_t key_len) 
+{
+	
+    int ret = 0;
+
+    struct tmem_invalidate_request tmem_invalidate_request = {
+        .key = key,
+        .key_len = key_len,
+    };
+
+    if (ioctl(fd, TMEM_INVAL, &tmem_invalidate_request)) {
+	fprintf(stderr, "tmem_inval: ioctl failed\n");
+	ret = -1;
+    }
+
+    return ret;
 }
 
 

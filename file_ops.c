@@ -11,11 +11,7 @@
 
 
 #include "redismodule.h"
-#include "tmem_ioctl.h"
-
-#define TMEM_PATH ("/dev/tmem_dev")
-extern int fd;
-
+#include "tmem.h"
 
 /* Like TmemGet, but write the input to a memory-mapped file */
 int TmemFileGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {

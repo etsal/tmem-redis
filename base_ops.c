@@ -11,107 +11,84 @@
 
 
 #include "redismodule.h"
-#include "tmem_ioctl.h"
+#include "tmem.h"
 
-#define TMEM_PATH ("/dev/tmem_dev")
-extern int fd;
 
 /* Vanilla command. Write the output to the command line */
 int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
+    int ret; 
+    size_t key_len, value_len;
+    char *value ;
+    char *key;
+
     if (argc != 2)
         return RedisModule_WrongArity(ctx);
- 
-    
-    size_t key_len, value_len;
-    char *key = RedisModule_StringPtrLen(argv[1], &key_len);    
-    char *value ;
 
+    key = RedisModule_StringPtrLen(argv[1], &key_len);    
     value = malloc(TMEM_MAX);
     if (!value) {
-        fprintf(stderr, "calloc() failed\n");
+        RedisModule_ReplyWithSimpleString(ctx, "ERROR"); 
         return REDISMODULE_OK;
     }
+    
+    ret = tmem_get(key, key_len, value, &value_len);
 
-    struct get_message get_message = {
-        .key = key,
-        .key_len = key_len,
-	.value = value,
-	.value_lenp = &value_len,
-    };
-
-    if (ioctl(fd, TMEM_GET, &get_message)) {
-        RedisModule_ReplyWithSimpleString(ctx, "Get Failed (not empty, failed)"); 
-    } else {
-	
-	value[value_len] = '\0';
-        RedisModule_ReplyWithSimpleString(ctx, get_message.value);
-    }
-
+    if (ret) 
+        RedisModule_ReplyWithSimpleString(ctx, "ERROR"); 
+    else
+        RedisModule_ReplyWithStringBuffer(ctx, value, value_len);
+    
     free(value);
 
     return REDISMODULE_OK;
     
 }
 
+
 /* Vanilla command. Read the input from the command line */
 int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     
+    int ret;
+    size_t key_len, value_len;
+    char *key, *value;
+
     if (argc != 3)
         return RedisModule_WrongArity(ctx);
 
-    size_t key_len, value_len;
-   
+    key = RedisModule_StringPtrLen(argv[1], &key_len);
+    value = RedisModule_StringPtrLen(argv[2], &value_len);
+    ret = tmem_put(key, key_len, value, value_len);
 
-    char *key = RedisModule_StringPtrLen(argv[1], &key_len);
-    char *value = RedisModule_StringPtrLen(argv[2], &value_len);
+    if (ret)
+        RedisModule_ReplyWithSimpleString(ctx, "ERROR");
+    else 
+	RedisModule_ReplyWithSimpleString(ctx, "OK");
 
-    struct put_message put_message = {
-        .key = key,
-        .key_len = key_len,
-        .value = value,
-        .value_len = value_len,
-    };
-
-    if (ioctl(fd, TMEM_PUT, &put_message)) {
-        RedisModule_ReplyWithSimpleString(ctx, "Put failed");
-        return REDISMODULE_ERR;
-    }
-
-    RedisModule_ReplyWithSimpleString(ctx, "Put OK");
     return REDISMODULE_OK;
 }
-
 
 
 /* Vanilla command. Invalidate a key */ 
 int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+    
+    int ret;
+    size_t key_len;
+    char *key;
 
     if (argc != 2)
         return RedisModule_WrongArity(ctx);
-    
-    size_t key_len;
-    char *key = RedisModule_StringPtrLen(argv[1], &key_len);
 
-    struct invalidate_message invalidate_message = {
-        .key = key,
-        .key_len = key_len,
-    };
+    key = RedisModule_StringPtrLen(argv[1], &key_len);
+    ret = tmem_inval(key, key_len);
 
-    if (ioctl(fd, TMEM_INVAL, &invalidate_message)) {
-        RedisModule_ReplyWithSimpleString(ctx, "Invalidate failed");
-        return REDISMODULE_OK;
-    }
-
-    RedisModule_ReplyWithSimpleString(ctx, "Invalidate OK");
+    if (ret)
+        RedisModule_ReplyWithSimpleString(ctx, "ERROR");
+    else 
+	RedisModule_ReplyWithSimpleString(ctx, "OK");
+        
     return REDISMODULE_OK;
 }
-
-int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
-        RedisModule_ReplyWithSimpleString(ctx, "Dummy done");
-	return REDISMODULE_OK;
-}
-
 
 
 /* Vanilla command. Write the output to the command line */
@@ -129,18 +106,16 @@ int ModuleGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     key = RedisModule_OpenKey(ctx, argv[1], REDISMODULE_READ);
     if (key) {
 	value = RedisModule_StringDMA(key, &value_len, REDISMODULE_READ);
-	RedisModule_ReplyWithSimpleString(ctx, value);
-
+	RedisModule_ReplyWithStringBuffer(ctx, value, value_len);
+	RedisModule_CloseKey(key);
     } else {
 	RedisModule_ReplyWithSimpleString(ctx, "");
     }
 
-    if (key)
-	RedisModule_CloseKey(key);
-
     return REDISMODULE_OK;
 
 }
+
 
 /* Vanilla command. Write the output to the command line */
 int ModuleSet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
@@ -154,13 +129,10 @@ int ModuleSet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     if (key) {
 	RedisModule_StringSet(key, argv[2]);
 	RedisModule_ReplyWithSimpleString(ctx, "OK");
-
+	RedisModule_CloseKey(key);
     } else {
 	RedisModule_ReplyWithSimpleString(ctx, "FAIL");
     }
-
-    if (key)
-	RedisModule_CloseKey(key);
 
     return REDISMODULE_OK;
 
