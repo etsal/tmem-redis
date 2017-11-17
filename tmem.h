@@ -18,6 +18,8 @@
 #define TCTRL_REAL   (1UL << 1) 
 #define TCTRL_SLEEPY (1UL << 2) 
 #define TCTRL_AWAKE  (1UL << 3) 
+#define TCTRL_SILENT (1UL << 4) 
+#define TCTRL_ANSWER (1UL << 5) 
 
 struct tmem_put_request {
     void *key;

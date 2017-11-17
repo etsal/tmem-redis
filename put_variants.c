@@ -59,18 +59,6 @@ int TmemDrop(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 }
 
 
-/* Like TmemDrop, but do not even reference the request */
-int TmemIgnore(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
-    
-    if (argc != 3)
-        return RedisModule_WrongArity(ctx);
-
-    RedisModule_ReplyWithSimpleString(ctx, "OK");
-
-    return REDISMODULE_OK;
-}
-
-
 /* Like TmemPut, but accepts no input - it poisons the entry by filling it with a specific byte */
 int TmemPoison(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     

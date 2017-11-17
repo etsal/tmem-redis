@@ -9,8 +9,6 @@
 #define realloc(ptr, size) RedisModule_Realloc(ptr, size)
 #define free(ptr) RedisModule_Free(ptr)
 
-int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-
 int ModuleGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int ModuleSet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
@@ -20,15 +18,17 @@ int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemReal(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-
+int TmemSleepy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
+int TmemAwake(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
-/* SilentGetDirty exists just to prove that it's not a page cache problem */
+int TmemAnswer(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
+
+/* TmemSilent renamed to use the name for a control operation */
+int TmemRedisSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemSilentDirty(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemGenerate(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 
-/* Ignore and drop exist just to prove that referencing strings is cheap */
-int TmemIgnore(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemDrop(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemPoison(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemPoisonMalloc(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);

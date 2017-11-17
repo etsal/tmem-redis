@@ -42,12 +42,24 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     if (RedisModule_CreateCommand(ctx, "tmem.real", TmemReal, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
+    if (RedisModule_CreateCommand(ctx, "tmem.sleepy", TmemSleepy, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
+    if (RedisModule_CreateCommand(ctx, "tmem.awake", TmemAwake, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
+    if (RedisModule_CreateCommand(ctx, "tmem.silent", TmemSilent, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
+    if (RedisModule_CreateCommand(ctx, "tmem.answer", TmemAnswer, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
     /* Get variants */
 
     if (RedisModule_CreateCommand(ctx, "tmem.get.generate", TmemGenerate, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
-    if (RedisModule_CreateCommand(ctx, "tmem.get.silent", TmemSilent, "write", 0, 0, 0) == REDISMODULE_ERR)
+    if (RedisModule_CreateCommand(ctx, "tmem.get.redissilent", TmemRedisSilent, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
     if (RedisModule_CreateCommand(ctx, "tmem.get.silentdirty", TmemSilentDirty, "write", 0, 0, 0) == REDISMODULE_ERR)
@@ -59,9 +71,6 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
         return REDISMODULE_ERR;
 
     if (RedisModule_CreateCommand(ctx, "tmem.put.drop", TmemDrop, "write", 0, 0, 0) == REDISMODULE_ERR)
-        return REDISMODULE_ERR;
-
-    if (RedisModule_CreateCommand(ctx, "tmem.put.ignore", TmemIgnore, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
     if (RedisModule_CreateCommand(ctx, "tmem.put.poison", TmemPoison, "write", 0, 0, 0) == REDISMODULE_ERR)

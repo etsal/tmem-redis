@@ -50,7 +50,7 @@ int TmemGenerate(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 }
 
 /* Like TmemGet, but do not return the string to the client */
-int TmemSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+int TmemRedisSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     int ret; 
     size_t key_len, value_len;

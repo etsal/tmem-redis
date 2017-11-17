@@ -14,7 +14,7 @@
 #include "tmem.h"
 #include "tmem_ioctl.h"
 
-int TmemControl(RedisModuleCtx *ctx, int argc, long flags) {
+int TmemControl(RedisModuleCtx *ctx, int argc, unsigned long flags) {
 
     int ret;
 
@@ -27,7 +27,7 @@ int TmemControl(RedisModuleCtx *ctx, int argc, long flags) {
     if (ret)
         RedisModule_ReplyWithSimpleString(ctx, "ERROR");
     else 
-	RedisModule_ReplyWithSimpleString(ctx, "OK");
+        RedisModule_ReplyWithSimpleString(ctx, "OK");
 
     return REDISMODULE_OK;
 }
@@ -51,7 +51,17 @@ int TmemSleepy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 }
 
 
-int Tmem(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+int TmemAwake(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     return TmemControl(ctx, argc, TCTRL_AWAKE);
+}
+
+int TmemSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+
+    return TmemControl(ctx, argc, TCTRL_SILENT);
+}
+
+int TmemAnswer(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+
+    return TmemControl(ctx, argc, TCTRL_ANSWER);
 }
