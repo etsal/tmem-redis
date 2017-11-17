@@ -5,15 +5,19 @@
 
 #define TMEM_MAGIC ('*') 
 
-#define TMEM_GET (_IOW(TMEM_MAGIC, 1, long))
-#define TMEM_PUT (_IOR(TMEM_MAGIC, 2, long))
-#define TMEM_INVAL (_IO(TMEM_MAGIC, 3))
-#define TMEM_CONTROL (_IO(TMEM_MAGIC, 4))
+#define TMEM_GET (_IOR(TMEM_MAGIC, 1, struct tmem_request))
+#define TMEM_PUT (_IOR(TMEM_MAGIC, 2, struct tmem_request))
+#define TMEM_INVAL (_IOR(TMEM_MAGIC, 3, struct tmem_request))
+#define TMEM_CONTROL (_IOR(TMEM_MAGIC, 4, long))
 
 #define TMEM_PATH ("/dev/tmem_dev")
 #define PAGE_SIZE (4096)
 #define TMEM_MAX (1024 * 1024)
 
+#define TCTRL_DUMMY  (1UL << 0) 
+#define TCTRL_REAL   (1UL << 1) 
+#define TCTRL_SLEEPY (1UL << 2) 
+#define TCTRL_AWAKE  (1UL << 3) 
 
 struct tmem_put_request {
     void *key;

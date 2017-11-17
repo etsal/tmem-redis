@@ -4,7 +4,7 @@ FLAGS=-Wall -Wno-discarded-qualifiers -Wno-unused-but-set-variable -Wno-unused-v
 
 all: tmem.so
 
-tmem.so: chunk.o chunk_commands.o base_ops.o put_variants.o get_variants.o tmem.o loader.o
+tmem.so: chunk.o chunk_commands.o base_ops.o put_variants.o get_variants.o control_variants.o tmem.o loader.o
 	gcc $^ -fPIC -shared -g -o tmem.so
     
 %.o: %.c

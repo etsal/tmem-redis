@@ -18,6 +18,8 @@ int TmemGet(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemPut(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 int TmemInval(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
+int TmemDummy(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
+int TmemReal(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 
 int TmemSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc);
 /* SilentGetDirty exists just to prove that it's not a page cache problem */
