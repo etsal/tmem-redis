@@ -67,7 +67,7 @@ int TmemRedisSilent(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return REDISMODULE_OK;
     }
     
-    ret = tmem_ioctl_get(key, key_len, value, &value_len);
+    ret = tmem_ioctl_get(key, key_len, value, &value_len, 0);
 
     if (ret) 
         RedisModule_ReplyWithSimpleString(ctx, "ERROR"); 
@@ -98,7 +98,7 @@ int TmemSilentDirty(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
         return REDISMODULE_OK;
     }
     
-    ret = tmem_ioctl_get(key, key_len, value, &value_len);
+    ret = tmem_ioctl_get(key, key_len, value, &value_len, 0);
 
     for (i = 0; i < value_len; i += PAGE_SIZE)
 	value[i] = 'a'; 

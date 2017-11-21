@@ -14,7 +14,7 @@
 
 extern int fd;
 
-int tmem_ioctl_get(void *key, size_t key_len, void *value, size_t *value_lenp) 
+int tmem_ioctl_get(void *key, size_t key_len, void *value, size_t *value_lenp, long flags) 
 {
 
     int ret = 0;
@@ -26,7 +26,12 @@ int tmem_ioctl_get(void *key, size_t key_len, void *value, size_t *value_lenp)
 	.value_lenp = value_lenp,
     };
 
-    ret = ioctl(fd, TMEM_GET, &tmem_get_request);
+    struct tmem_request tmem_request = {
+	.get = tmem_get_request,
+	.flags = flags,
+    };
+
+    ret = ioctl(fd, TMEM_GET, &tmem_request);
     if (ret) 
 	perror("ioctl_get");
     
@@ -34,7 +39,7 @@ int tmem_ioctl_get(void *key, size_t key_len, void *value, size_t *value_lenp)
     return ret;    
 }
 
-int tmem_ioctl_put(void *key, size_t key_len, void *value, size_t value_len) 
+int tmem_ioctl_put(void *key, size_t key_len, void *value, size_t value_len, long flags) 
 {
     
     int ret = 0;
@@ -46,7 +51,12 @@ int tmem_ioctl_put(void *key, size_t key_len, void *value, size_t value_len)
         .value_len = value_len,
     };
 
-    ret = ioctl(fd, TMEM_PUT, &tmem_put_request);
+    struct tmem_request tmem_request = {
+	.put = tmem_put_request,
+	.flags = flags,
+    };
+
+    ret = ioctl(fd, TMEM_PUT, &tmem_request);
     if (ret) 
 	perror("ioctl_put");
     
@@ -54,7 +64,7 @@ int tmem_ioctl_put(void *key, size_t key_len, void *value, size_t value_len)
     return ret;
 }
 
-int tmem_ioctl_inval(void *key, size_t key_len) 
+int tmem_ioctl_inval(void *key, size_t key_len, long flags) 
 {
 	
     int ret = 0;
@@ -64,7 +74,12 @@ int tmem_ioctl_inval(void *key, size_t key_len)
         .key_len = key_len,
     };
 
-    ret = ioctl(fd, TMEM_INVAL, &tmem_invalidate_request);
+    struct tmem_request tmem_request = {
+	.inval = tmem_invalidate_request,
+	.flags = flags,
+    };
+
+    ret = ioctl(fd, TMEM_INVAL, &tmem_request);
     if (ret) 
 	perror("ioctl_inval");
     

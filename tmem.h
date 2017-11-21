@@ -14,10 +14,10 @@
 #define PAGE_SIZE (4096)
 #define TMEM_MAX (1024 * 1024)
 
-#define TCTRL_DUMMY  (1UL << 0) 
-#define TCTRL_REAL   (1UL << 1) 
+#define TCTRL_DUMMY (1UL << 0) 
+#define TCTRL_REAL (1UL << 1) 
 #define TCTRL_SLEEPY (1UL << 2) 
-#define TCTRL_AWAKE  (1UL << 3) 
+#define TCTRL_AWAKE (1UL << 3) 
 #define TCTRL_SILENT (1UL << 4) 
 #define TCTRL_ANSWER (1UL << 5) 
 
@@ -51,6 +51,7 @@ struct tmem_request {
 		struct tmem_get_request get;
 		struct tmem_invalidate_request inval;
 	};
+	long flags;
 };
 
 
