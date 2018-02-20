@@ -33,6 +33,8 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     if (RedisModule_CreateCommand(ctx, "tmem.inval", TmemInval, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
+    if (RedisModule_CreateCommand(ctx, "tmem.generate_size", TmemGenerateSize, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
 
     /* Control commands */
     
@@ -54,9 +56,15 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     if (RedisModule_CreateCommand(ctx, "tmem.answer", TmemAnswer, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
+    if (RedisModule_CreateCommand(ctx, "tmem.generate", TmemGenerate, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
+    if (RedisModule_CreateCommand(ctx, "tmem.input", TmemInput, "write", 0, 0, 0) == REDISMODULE_ERR)
+        return REDISMODULE_ERR;
+
     /* Get variants */
 
-    if (RedisModule_CreateCommand(ctx, "tmem.get.generate", TmemGenerate, "write", 0, 0, 0) == REDISMODULE_ERR)
+    if (RedisModule_CreateCommand(ctx, "tmem.get.redisgenerate", TmemRedisGenerate, "write", 0, 0, 0) == REDISMODULE_ERR)
         return REDISMODULE_ERR;
 
     if (RedisModule_CreateCommand(ctx, "tmem.get.redissilent", TmemRedisSilent, "write", 0, 0, 0) == REDISMODULE_ERR)

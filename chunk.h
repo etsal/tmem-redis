@@ -3,7 +3,6 @@
 
 #include "redismodule.h"
 #include "tmem.h"
-#include "tmem_ioctl.h"
 
 #define CHUNK_SIZE (8192)
 #define MAX_MEMBERS (100)

@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "redismodule.h"
 #include "tmem.h"
-#include "tmem_ioctl.h"
 #include "chunk.h"
 
 #define KEY_TABLE ("KEY_TABLE")

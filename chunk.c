@@ -4,7 +4,6 @@
 
 #include "redismodule.h"
 #include "tmem.h"
-#include "tmem_ioctl.h"
 #include "chunk.h"
 
 

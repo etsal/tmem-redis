@@ -99,3 +99,16 @@ int tmem_ioctl_control(long flags)
     return ret;
 
 }
+
+int tmem_ioctl_generate_size(size_t size)
+{	
+    int ret = 0;
+    
+    ret = ioctl(fd, TMEM_GENERATE_SIZE, (long) size);
+    if (ret) 
+	perror("ioctl_control");
+    
+
+    return ret;
+
+}

@@ -15,7 +15,7 @@
 #include "tmem_ioctl.h"
 
 /* Like TmemGet, but instead of a tmem operation generate the string here */
-int TmemGenerate(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+int TmemRedisGenerate(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     int ret; 
     size_t key_len, value_len;

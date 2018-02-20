@@ -9,6 +9,7 @@
 #define TMEM_PUT (_IOR(TMEM_MAGIC, 2, struct tmem_request))
 #define TMEM_INVAL (_IOR(TMEM_MAGIC, 3, struct tmem_request))
 #define TMEM_CONTROL (_IOR(TMEM_MAGIC, 4, long))
+#define TMEM_GENERATE_SIZE (_IOR(TMEM_MAGIC, 5, long))
 
 #define TMEM_PATH ("/dev/tmem_dev")
 #define PAGE_SIZE (4096)
@@ -20,6 +21,8 @@
 #define TCTRL_AWAKE (1UL << 3) 
 #define TCTRL_SILENT (1UL << 4) 
 #define TCTRL_ANSWER (1UL << 5) 
+#define TCTRL_GENERATE (1UL << 6) 
+#define TCTRL_INPUT (1UL << 7) 
 
 struct tmem_put_request {
     void *key;

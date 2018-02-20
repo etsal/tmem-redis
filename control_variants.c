@@ -65,3 +65,36 @@ int TmemAnswer(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     return TmemControl(ctx, argc, TCTRL_ANSWER);
 }
+
+int TmemGenerate(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+
+    return TmemControl(ctx, argc, TCTRL_GENERATE);
+}
+
+int TmemInput(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+
+    return TmemControl(ctx, argc, TCTRL_INPUT);
+}
+
+int TmemGenerateSize(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
+
+    int ret;
+    unsigned long size;
+
+    if (argc != 2)
+        return RedisModule_WrongArity(ctx);
+    
+    if (RedisModule_StringToLongLong(argv[1], &size) != REDISMODULE_OK) {
+        RedisModule_ReplyWithSimpleString(ctx, "ERROR");
+	return REDISMODULE_OK;	
+    }
+	
+    ret = tmem_ioctl_generate_size(size);
+
+    if (ret)
+        RedisModule_ReplyWithSimpleString(ctx, "ERROR");
+    else 
+        RedisModule_ReplyWithSimpleString(ctx, "OK");
+
+    return REDISMODULE_OK;
+}
